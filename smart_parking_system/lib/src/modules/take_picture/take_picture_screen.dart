@@ -65,19 +65,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 ElevatedButton(
                     onPressed: (() async {
-                      // Take the Picture in a try / catch block. If anything goes wrong,
-                      // catch the error.
+                      
                       try {
-                        // Ensure that the camera is initialized.
                         await _initializeControllerFuture;
-
-                        // Attempt to take a picture and get the file `image`
-                        // where it was saved.
                         final image = await _controller.takePicture();
-
                         if (!mounted) return;
-
-                        // If the picture was taken, display it on a new screen.
                         Provider.of<FireStorageProvider>(context, listen: false)
                             .imagePath = image.path;
                         // print("Take a picture success: " +
@@ -85,13 +77,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                         //             listen: false)
                         //         .imagePath
                         //         .toString());
+                        Provider.of<RouteProvider>(context, listen: false)
+                            .changeTakeSuccessfull();
                       } catch (e) {
-                        // If an error occurs, log the error to the console.
                         // print(e);
                       }
-                      // ignore: use_build_context_synchronously
-                      Provider.of<RouteProvider>(context, listen: false)
-                          .changeTakeSuccessfull();
                     }),
                     style: ElevatedButton.styleFrom(
                         primary: Colors.white,

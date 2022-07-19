@@ -28,7 +28,7 @@ class _TakePictureState extends State<TakePicture> {
                 linkQR: Provider.of<FireStorageProvider>(context, listen: false)
                     .linkImageFireStorage,
               )
-            : Provider.of<RouteProvider>(context, listen: false).takeSuccessful
+            : Provider.of<RouteProvider>(context, listen: true).takeSuccessful
                 ? confirmPicture(context)
                 : TakePictureScreen(
                     camera: Provider.of<CameraProvider>(context, listen: false)

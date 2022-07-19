@@ -5,6 +5,7 @@ class CameraProvider extends ChangeNotifier {
   late CameraDescription firstCamera;
   CameraProvider() {
     initCamera();
+    notifyListeners();
   }
   void initCamera() async {
     final cameras = await availableCameras();

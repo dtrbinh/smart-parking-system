@@ -7,6 +7,7 @@ class ScannerProvider extends ChangeNotifier {
   String qrResult = "";
   String imageURL = "";
   bool isScanning = true;
+  
   void readResult(Barcode scanData) {
     result = scanData;
     qrResult = result!.code!;

@@ -8,6 +8,7 @@ class FireStorageProvider extends ChangeNotifier {
   String imagePath = "";
   String linkImageFireStorage = "";
   String linkQR = "";
+  List<String> qrHistory = [];
 
   Future<void> uploadtoFireStorage() async {
     final firebaseStorage = FirebaseStorage.instance;
@@ -33,7 +34,7 @@ class FireStorageProvider extends ChangeNotifier {
     linkQR =
         "http://api.qrserver.com/v1/create-qr-code/?data=$linkImageFireStorage&size=400x400";
     // print("QR: $linkQR");
-
+    qrHistory.add(linkQR);
     notifyListeners();
   }
 
@@ -51,6 +52,7 @@ class FireStorageProvider extends ChangeNotifier {
     imagePath = "";
     linkImageFireStorage = "";
     linkQR = "";
+    qrHistory = [];
     notifyListeners();
   }
 }

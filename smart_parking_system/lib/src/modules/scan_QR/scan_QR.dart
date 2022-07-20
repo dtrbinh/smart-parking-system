@@ -23,7 +23,7 @@ class _ScanQRCodeState extends State<ScanQRCode> {
   void reassemble() {
     super.reassemble();
     if (Platform.isAndroid) {
-      controller?.resumeCamera();
+      controller!.resumeCamera();
     }
     controller!.resumeCamera();
   }
@@ -88,15 +88,15 @@ class _ScanQRCodeState extends State<ScanQRCode> {
     // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
     var scanArea = (MediaQuery.of(context).size.width < 400 ||
             MediaQuery.of(context).size.height < 400)
-        ? 150.0
-        : 300.0;
+        ? MediaQuery.of(context).size.width - 100
+        : MediaQuery.of(context).size.width - 100;
     // To ensure the Scanner view is properly sizes after rotation
     // we need to listen for Flutter SizeChanged notification and update controller
     return QRView(
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
       overlay: QrScannerOverlayShape(
-          borderColor: Colors.red,
+          borderColor: Colors.blue,
           borderRadius: 10,
           borderLength: 30,
           borderWidth: 10,
@@ -114,7 +114,7 @@ class _ScanQRCodeState extends State<ScanQRCode> {
         result = scanData;
       });
       Provider.of<ScannerProvider>(context, listen: false).readResult(scanData);
-      
+
       Provider.of<ScannerProvider>(context, listen: false).scanSuccess();
     });
   }

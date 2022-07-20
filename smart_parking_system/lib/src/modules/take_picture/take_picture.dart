@@ -22,16 +22,15 @@ class _TakePictureState extends State<TakePicture> {
   Widget build(BuildContext context) {
     return Center(child: Consumer(
       builder: (context, value, child) {
-        return Provider.of<RouteProvider>(context, listen: false)
-                .confirmGenerate
+        return Provider.of<RouteProvider>(context, listen: true).confirmGenerate
             ? GenerateQR(
-                linkQR: Provider.of<FireStorageProvider>(context, listen: false)
+                linkQR: Provider.of<FireStorageProvider>(context, listen: true)
                     .linkImageFireStorage,
               )
             : Provider.of<RouteProvider>(context, listen: true).takeSuccessful
                 ? confirmPicture(context)
                 : TakePictureScreen(
-                    camera: Provider.of<CameraProvider>(context, listen: false)
+                    camera: Provider.of<CameraProvider>(context, listen: true)
                         .firstCamera);
       },
     ));
@@ -42,8 +41,7 @@ class _TakePictureState extends State<TakePicture> {
       alignment: AlignmentDirectional.center,
       children: [
         Container(
-          width: MediaQuery.of(context).size.width - 50,
-          height: 600,
+          width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5), color: Colors.grey),
           child: DisplayPictureScreen(

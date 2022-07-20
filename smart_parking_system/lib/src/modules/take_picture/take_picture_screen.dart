@@ -43,8 +43,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       alignment: AlignmentDirectional.center,
       children: [
         Container(
-          width: MediaQuery.of(context).size.width - 50,
-          height: 600,
+          width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5), color: Colors.grey),
           child: FutureBuilder<void>(
@@ -65,7 +64,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 ElevatedButton(
                     onPressed: (() async {
-                      
                       try {
                         await _initializeControllerFuture;
                         final image = await _controller.takePicture();

@@ -34,7 +34,11 @@ class _ScanQRCodeState extends State<ScanQRCode> {
       builder: (context, value, child) {
         return Provider.of<ScannerProvider>(context, listen: true).isScanning
             ? scanStep(context)
-            : checkStep(context);
+            : Provider.of<ScannerProvider>(context, listen: true).isFetching
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : checkStep(context);
       },
     );
   }
@@ -48,20 +52,49 @@ class _ScanQRCodeState extends State<ScanQRCode> {
           ),
           Expanded(
               child: Container(
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-            child: Image.network(
-                Provider.of<ScannerProvider>(context, listen: false).imageURL),
-          )),
+                  width: MediaQuery.of(context).size.width,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                  child: Consumer(
+                    builder: (context, value, child) {
+                      return Provider.of<ScannerProvider>(context, listen: true)
+                              .isCheckOut
+                          ? Center(
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text("Xe này đã checkout!"),
+                                    Text(
+                                        "Thời gian checkout: ${Provider.of<ScannerProvider>(context, listen: false).checkOutTime.toDate().toString()}")
+                                  ]),
+                            )
+                          : Image.network(Provider.of<ScannerProvider>(context,
+                                  listen: false)
+                              .imageURL);
+                    },
+                  ))),
           const SizedBox(
             height: 20,
           ),
-          ElevatedButton(
-              onPressed: () {
-                Provider.of<ScannerProvider>(context, listen: false)
-                    .completeCheckOut();
-              },
-              child: const Text("OK"))
+          Consumer(
+            builder: (context, value, child) {
+              return Provider.of<ScannerProvider>(context, listen: true)
+                          .isCheckOut ==
+                      false
+                  ? ElevatedButton(
+                      onPressed: () {
+                        Provider.of<ScannerProvider>(context, listen: false)
+                            .completeCheckOut();
+                      },
+                      child: const Text("OK"))
+                  : ElevatedButton(
+                      onPressed: () {
+                        Provider.of<ScannerProvider>(context, listen: false)
+                            .resetProvider();
+                      },
+                      child: const Text("Cancel"));
+            },
+          )
         ],
       ),
     );
@@ -114,7 +147,6 @@ class _ScanQRCodeState extends State<ScanQRCode> {
         result = scanData;
       });
       Provider.of<ScannerProvider>(context, listen: false).readResult(scanData);
-
       Provider.of<ScannerProvider>(context, listen: false).scanSuccess();
     });
   }

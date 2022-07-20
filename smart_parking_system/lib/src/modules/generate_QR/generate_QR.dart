@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_parking_system/src/data/provider/qr_scanner_provider.dart';
 import 'package:smart_parking_system/src/data/provider/route_provider.dart';
 import 'package:smart_parking_system/src/data/provider/upload_firestorage_provider.dart';
 

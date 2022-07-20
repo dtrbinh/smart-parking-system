@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
+import 'package:smart_parking_system/src/data/models/parker.dart';
 
 class FireStorageProvider extends ChangeNotifier {
   String imagePath = "";
@@ -22,11 +24,25 @@ class FireStorageProvider extends ChangeNotifier {
           .putFile(file);
       linkImageFireStorage = await snapshot.ref.getDownloadURL();
       generateQR();
+      await uploadToCloudFireStore();
     } else {
       // print('No Image Path Received');
     }
     deleteFile(File(imagePath));
     notifyListeners();
+  }
+
+  Future<void> uploadToCloudFireStore() async {
+    final FirebaseFirestore fireStore = FirebaseFirestore.instance;
+    fireStore.settings = const Settings(persistenceEnabled: true);
+    CollectionReference parkers = fireStore.collection('Parkers');
+    String fileName = basename(imagePath);
+    fileName = fileName.replaceAll('CAP', '');
+    fileName = fileName.replaceAll('.jpg', '');
+    Parker newParker = Parker(fileName, linkImageFireStorage, linkQR);
+    parkers.doc(newParker.parkerID).set(newParker.toJson()).then((value) {
+      print('Parker add success');
+    }).catchError((error) => {print('Parker add fail: $error')});
   }
 
   void generateQR() {

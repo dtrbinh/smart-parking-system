@@ -41,8 +41,10 @@ class FireStorageProvider extends ChangeNotifier {
     fileName = fileName.replaceAll('.jpg', '');
     Parker newParker = Parker(fileName, linkImageFireStorage, linkQR);
     parkers.doc(newParker.parkerID).set(newParker.toJson()).then((value) {
-      print('Parker add success');
-    }).catchError((error) => {print('Parker add fail: $error')});
+      // print('Parker add success');
+    }).catchError((error) => null
+        /*print('Parker add fail: $error')*/
+        );
   }
 
   void generateQR() {

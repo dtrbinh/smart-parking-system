@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_parking_system/src/data/provider/route_provider.dart';
+import 'package:smart_parking_system/src/data/provider/guard_route_provider.dart';
 import 'package:smart_parking_system/src/data/provider/upload_firestorage_provider.dart';
 
 // A screen that allows users to take a picture using a given camera.
@@ -75,7 +75,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                         //             listen: false)
                         //         .imagePath
                         //         .toString());
-                        Provider.of<RouteProvider>(context, listen: false)
+                        Provider.of<GuardRouteProvider>(context, listen: false)
                             .changeTakeSuccessfull();
                       } catch (e) {
                         // print(e);

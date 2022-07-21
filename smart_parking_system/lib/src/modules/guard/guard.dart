@@ -3,17 +3,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/src/data/provider/camera_provider.dart';
-import 'package:smart_parking_system/src/data/provider/route_provider.dart';
+import 'package:smart_parking_system/src/data/provider/guard_route_provider.dart';
 import 'package:smart_parking_system/src/data/provider/upload_firestorage_provider.dart';
 
-class Manager extends StatefulWidget {
-  const Manager({Key? key}) : super(key: key);
+class Guard extends StatefulWidget {
+  const Guard({Key? key}) : super(key: key);
 
   @override
-  State<Manager> createState() => _ManagerState();
+  State<Guard> createState() => _GuardState();
 }
 
-class _ManagerState extends State<Manager> {
+class _GuardState extends State<Guard> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -32,7 +32,7 @@ class _ManagerState extends State<Manager> {
                                     context,
                                     listen: false)
                                 .imagePath));
-                        Provider.of<RouteProvider>(context, listen: false)
+                        Provider.of<GuardRouteProvider>(context, listen: false)
                             .resetProvider();
                         Provider.of<CameraProvider>(context, listen: false)
                             .resetProvider();
@@ -47,9 +47,9 @@ class _ManagerState extends State<Manager> {
             ),
             bottomNavigationBar: BottomNavigationBar(
                 type: BottomNavigationBarType.fixed,
-                currentIndex: Provider.of<RouteProvider>(context).selectedIndex,
+                currentIndex: Provider.of<GuardRouteProvider>(context).selectedIndex,
                 onTap: (int index) {
-                  Provider.of<RouteProvider>(context, listen: false)
+                  Provider.of<GuardRouteProvider>(context, listen: false)
                       .changeSelectedIndex(index);
                 },
                 items: const [
@@ -60,7 +60,7 @@ class _ManagerState extends State<Manager> {
                 ]),
             body: Consumer(
               builder: (context, value, child) =>
-                  Provider.of<RouteProvider>(context).getBody(),
+                  Provider.of<GuardRouteProvider>(context).getBody(),
             )));
   }
 }

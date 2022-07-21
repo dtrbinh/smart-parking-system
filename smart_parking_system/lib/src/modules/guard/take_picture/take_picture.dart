@@ -4,11 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/src/data/provider/camera_provider.dart';
-import 'package:smart_parking_system/src/data/provider/route_provider.dart';
+import 'package:smart_parking_system/src/data/provider/guard_route_provider.dart';
 import 'package:smart_parking_system/src/data/provider/upload_firestorage_provider.dart';
 import 'package:smart_parking_system/src/modules/generate_QR/generate_QR.dart';
-import 'package:smart_parking_system/src/modules/take_picture/display_picture_screen.dart';
-import 'package:smart_parking_system/src/modules/take_picture/take_picture_screen.dart';
+import 'package:smart_parking_system/src/modules/guard/take_picture/display_picture_screen.dart';
+import 'package:smart_parking_system/src/modules/guard/take_picture/take_picture_screen.dart';
 
 class TakePicture extends StatefulWidget {
   const TakePicture({Key? key}) : super(key: key);
@@ -22,12 +22,12 @@ class _TakePictureState extends State<TakePicture> {
   Widget build(BuildContext context) {
     return Center(child: Consumer(
       builder: (context, value, child) {
-        return Provider.of<RouteProvider>(context, listen: true).confirmGenerate
+        return Provider.of<GuardRouteProvider>(context, listen: true).confirmGenerate
             ? GenerateQR(
                 linkQR: Provider.of<FireStorageProvider>(context, listen: true)
                     .linkImageFireStorage,
               )
-            : Provider.of<RouteProvider>(context, listen: true).takeSuccessful
+            : Provider.of<GuardRouteProvider>(context, listen: true).takeSuccessful
                 ? confirmPicture(context)
                 : TakePictureScreen(
                     camera: Provider.of<CameraProvider>(context, listen: true)
@@ -63,7 +63,7 @@ class _TakePictureState extends State<TakePicture> {
                                   context,
                                   listen: false)
                               .imagePath));
-                      Provider.of<RouteProvider>(context, listen: false)
+                      Provider.of<GuardRouteProvider>(context, listen: false)
                           .changeTakeSuccessfull();
                     }),
                     style: ElevatedButton.styleFrom(
@@ -80,7 +80,7 @@ class _TakePictureState extends State<TakePicture> {
                           .uploadtoFireStorage();
                       //Lấy link ảnh firebase dùng API gen link ảnh QR
                       //Xác nhận gen thành công, gửi link QR sang để hiển thị và in
-                      Provider.of<RouteProvider>(context, listen: false)
+                      Provider.of<GuardRouteProvider>(context, listen: false)
                           .changeConfirmGenerate();
                     }),
                     style: ElevatedButton.styleFrom(

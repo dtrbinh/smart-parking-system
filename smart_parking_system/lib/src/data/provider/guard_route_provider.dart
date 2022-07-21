@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:smart_parking_system/src/modules/guard/scan_QR/scan_QR.dart';
+import 'package:smart_parking_system/src/modules/guard/take_picture/take_picture.dart';
 import 'package:smart_parking_system/src/modules/login_screen/login_screen.dart';
-import 'package:smart_parking_system/src/modules/scan_QR/scan_QR.dart';
-import 'package:smart_parking_system/src/modules/take_picture/take_picture.dart';
 
-class RouteProvider extends ChangeNotifier {
+class GuardRouteProvider extends ChangeNotifier {
   int selectedIndex = 0;
   bool takeSuccessful = false;
   bool confirmGenerate = false;

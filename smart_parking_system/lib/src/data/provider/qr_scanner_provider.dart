@@ -34,11 +34,11 @@ class ScannerProvider extends ChangeNotifier {
   }
 
   Future<void> checkParker() async {
-    print('------------------Checking-----------------');
+    // print('------------------Checking-----------------');
     final fireStore = FirebaseFirestore.instance;
     String parkerID = imageURL.substring(
         imageURL.indexOf('CAP') + 3, imageURL.indexOf('.jpg'));
-    print(parkerID);
+    // print(parkerID);
     final doc = await fireStore.collection("Parkers").doc(parkerID).get();
     Parker parkerCheckOut = Parker.fromJson(doc.data() as Map<String, dynamic>);
     isCheckOut = parkerCheckOut.isCheckOut;
@@ -54,8 +54,8 @@ class ScannerProvider extends ChangeNotifier {
     CollectionReference parkers = fireStore.collection("Parkers");
     parkers.doc(parkerID).update(
         {'checkOut': Timestamp.now(), 'isCheckOut': true}).then((value) {
-      print('Parker updated. Checkout success');
-    }).catchError((error) => {print('Parker update fail: $error')});
+      // print('Parker updated. Checkout success');
+    }).catchError((error) => null /*print('Parker update fail: $error')*/);
     notifyListeners();
   }
 
@@ -69,8 +69,8 @@ class ScannerProvider extends ChangeNotifier {
     FirebaseStorage.instance
         .refFromURL(imageURL)
         .delete()
-        .then((value) => print('Delete success.'))
-        .catchError((error) => {print('Delete error: $error')});
+        .then((value) => null /*print('Delete success.')*/)
+        .catchError((error) => null /*print('Delete error: $error')*/);
   }
 
   void resetProvider() {

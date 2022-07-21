@@ -1,7 +1,7 @@
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_parking_system/src/data/provider/qr_scanner_provider.dart';
-import 'package:smart_parking_system/src/data/provider/route_provider.dart';
+import 'package:smart_parking_system/src/data/provider/guard_route_provider.dart';
 import 'package:smart_parking_system/src/data/provider/upload_firestorage_provider.dart';
 
 class GenerateQR extends StatefulWidget {
@@ -47,9 +47,9 @@ class _GenerateQRState extends State<GenerateQR> {
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 ElevatedButton(
                     onPressed: (() {
-                      Provider.of<RouteProvider>(context, listen: false)
+                      Provider.of<GuardRouteProvider>(context, listen: false)
                           .changeConfirmGenerate();
-                      Provider.of<RouteProvider>(context, listen: false)
+                      Provider.of<GuardRouteProvider>(context, listen: false)
                           .changeTakeSuccessfull();
                       Provider.of<FireStorageProvider>(context, listen: false)
                           .resetProvider();

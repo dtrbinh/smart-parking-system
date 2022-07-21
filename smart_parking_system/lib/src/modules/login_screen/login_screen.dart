@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/src/data/provider/camera_provider.dart';
-import 'package:smart_parking_system/src/modules/app.dart';
+import 'package:smart_parking_system/src/modules/guard/guard.dart';
+import 'package:smart_parking_system/src/modules/manager/manager.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -51,9 +52,22 @@ class LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                             context,
                             CupertinoPageRoute(
+                                builder: ((context) => const Guard())));
+                      },
+                      child: const Text("Login Guard")),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Provider.of<CameraProvider>(context, listen: false)
+                            .initCamera();
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
                                 builder: ((context) => const Manager())));
                       },
-                      child: const Text("Login"))
+                      child: const Text("Login Manager")),
                 ],
               ),
             ))));

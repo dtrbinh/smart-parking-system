@@ -5,8 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:smart_parking_system/data/models/detect_box.dart';
 import 'package:smart_parking_system/data/models/parker.dart';
 import 'package:smart_parking_system/features/error/ErrorLogger.dart';
@@ -46,15 +48,22 @@ class StorageProvider extends ChangeNotifier {
           logError('----------Internal Error: $error');
         });
         await uploadData();
-      } catch (e) {
+      } catch (e, stackTrace) {
         logError('----------Internal Error: $e');
+        await Sentry.captureException(
+          e,
+          stackTrace: stackTrace,
+        );
       } finally {
         notifyListeners();
       }
     } else {
       logError('----------Internal Error: No image to upload.');
+      await Sentry.captureException(
+        Exception("No image to upload."),
+        stackTrace: null,
+      );
     }
-
     notifyListeners();
   }
 
@@ -67,8 +76,12 @@ class StorageProvider extends ChangeNotifier {
     Parker newParker = Parker(fileName, linkImageFireStorage, linkQR);
     parkers.doc(newParker.parkerID).set(newParker.toJson()).then((value) {
       // print('Parker add success');
-    }).catchError((error) {
+    }).catchError((error, stackTrace) async {
       logError('----------Internal Error: $error');
+      await Sentry.captureException(
+        error,
+        stackTrace: stackTrace,
+      );
     });
   }
 
@@ -92,8 +105,13 @@ class StorageProvider extends ChangeNotifier {
       detectBox = DetectBox.fromJson(json.decode(response.body));
       await cropNumplateFrame();
       await ocrScan();
-    }, onError: (error) {
+    }, onError: (error, stackTrace) async {
       logError('----------Internal Error: $error');
+      await Sentry.captureException(
+        error,
+        stackTrace: stackTrace,
+      );
+      deleteImageCache(File(imagePath));
     });
   }
 
@@ -118,9 +136,13 @@ class StorageProvider extends ChangeNotifier {
       } else {
         isDetectSuccess = false;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       isDetectSuccess = false;
       logError('----------Internal Error: $e');
+      await Sentry.captureException(
+        e,
+        stackTrace: stackTrace,
+      );
     } finally {
       isDetect = true;
       deleteImageCache(File(imagePath));
@@ -131,14 +153,56 @@ class StorageProvider extends ChangeNotifier {
   Future<void> ocrScan() async {
     try {
       if (isDetectSuccess) {
+        final textRecognizer =
+            TextRecognizer(script: TextRecognitionScript.latin);
+        for (int i = 0; i < listNumplate.length; i++) {
+          final RecognizedText recognizedText = await textRecognizer
+              .processImage(InputImage.fromFile(listNumplate[i]));
+          String result = "";
+          // String allText = recognizedText.text;
+          // logWarning(allText);
+          for (TextBlock block in recognizedText.blocks) {
+            //each block of text/section of text
+            // final String text = block.text;
+            // logWarning("Block of text: $text");
+            for (TextLine line in block.lines) {
+              //each line within a text block
+              for (TextElement element in line.elements) {
+                //each word within a line
+                result += "${element.text} ";
+              }
+            }
+          }
+          //result += "\n\n";
+          listNumplateText.add(result);
+          logWarning("----------Detect result: $result.");
+        }
+        textRecognizer.close();
+        isDetectSuccess = true;
         //scan image
       } else {
+        isDetectSuccess = false;
         logError('----------Internal Error: No image to scan.');
+        await Sentry.captureException(
+          Exception("No image to scan"),
+          stackTrace: "No stack trace",
+        );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      isDetectSuccess = false;
       logError('----------Internal Error: $e');
+      await Sentry.captureException(
+        e,
+        stackTrace: stackTrace,
+      );
     } finally {
       notifyListeners();
+      //Delete temp file save image
+      Future.delayed(const Duration(milliseconds: 100)).then((value) {
+        for (int i = 0; i < listNumplate.length; i++) {
+          deleteImageCache(listNumplate[i]);
+        }
+      });
     }
   }
 
@@ -147,9 +211,19 @@ class StorageProvider extends ChangeNotifier {
       if (await file.exists()) {
         await file.delete();
         logWarning('------------Deleted picture: ${file.path}');
-      } else {}
-    } catch (e) {
+      } else {
+        logError('----------Internal Error: File not exists.');
+        await Sentry.captureException(
+          Exception("File to delete not exists"),
+          stackTrace: null,
+        );
+      }
+    } catch (e, stackTrace) {
       logError('----------Internal Error: $e');
+      await Sentry.captureException(
+        e,
+        stackTrace: stackTrace,
+      );
     }
   }
 

@@ -7,10 +7,12 @@ import 'package:smart_parking_system/data/provider/storage_provider.dart';
 
 class QRWidgetView extends StatefulWidget {
   final String linkQR;
+
   const QRWidgetView({
     super.key,
     required this.linkQR,
   });
+
   @override
   State<QRWidgetView> createState() => _QRWidgetViewState();
 }
@@ -34,17 +36,17 @@ class _QRWidgetViewState extends State<QRWidgetView> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: context
                                 .read<StorageProvider>()
-                                .listNumplate
-                                .map((e) => Image.file(
-                                      e,
-                                      height: 150,
-                                      width: 0.75 *
-                                              MediaQuery.of(context)
-                                                  .size
-                                                  .width -
-                                          50,
-                                      fit: BoxFit.scaleDown,
-                                    ))
+                                .listNumplateText
+                                .map((e) => Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Text(
+                                        e,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                ))
                                 .toList(),
                           ),
                         )
@@ -54,7 +56,7 @@ class _QRWidgetViewState extends State<QRWidgetView> {
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Text("Numplate detecting"),
+                        Text("Plate number detecting"),
                         SizedBox(
                           height: 10,
                         ),
@@ -99,11 +101,9 @@ class _QRWidgetViewState extends State<QRWidgetView> {
             ],
           )
         : const Center(
-            child: SpinKitSpinningLines(
-            color: Colors.black,
-            itemCount: 10,
-            lineWidth: 3,
-            size: 100,
-          ));
+            child: SpinKitFadingCircle(
+              color: Colors.black,
+              size: 100,
+            ));
   }
 }

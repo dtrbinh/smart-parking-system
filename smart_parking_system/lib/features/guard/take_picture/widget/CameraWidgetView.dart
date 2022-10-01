@@ -1,24 +1,24 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings
-
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_parking_system/src/data/provider/route_provider.dart';
-import 'package:smart_parking_system/src/data/provider/upload_firestorage_provider.dart';
+import 'package:smart_parking_system/features/error/ErrorLogger.dart';
+import 'package:smart_parking_system/features/guard/GuardViewModel.dart';
+import 'package:smart_parking_system/data/provider/storage_provider.dart';
 
 // A screen that allows users to take a picture using a given camera.
-class TakePictureScreen extends StatefulWidget {
-  const TakePictureScreen({
+class CameraWidgetView extends StatefulWidget {
+  const CameraWidgetView({
     super.key,
     required this.camera,
   });
   final CameraDescription camera;
   @override
-  TakePictureScreenState createState() => TakePictureScreenState();
+  CameraWidgetViewState createState() => CameraWidgetViewState();
 }
 
-class TakePictureScreenState extends State<TakePictureScreen> {
+class CameraWidgetViewState extends State<CameraWidgetView> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   @override
@@ -26,7 +26,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     super.initState();
     _controller = CameraController(
       widget.camera,
-      ResolutionPreset.high,
+      ResolutionPreset.veryHigh,
     );
     _initializeControllerFuture = _controller.initialize();
   }
@@ -43,8 +43,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       alignment: AlignmentDirectional.center,
       children: [
         Container(
-          width: MediaQuery.of(context).size.width - 50,
-          height: 600,
+          width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5), color: Colors.grey),
           child: FutureBuilder<void>(
@@ -53,7 +52,12 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               if (snapshot.connectionState == ConnectionState.done) {
                 return CameraPreview(_controller);
               } else {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(
+                    child: SpinKitRipple(
+                  color: Colors.blue,
+                  size: 100,
+                  borderWidth: 10,
+                ));
               }
             },
           ),
@@ -65,22 +69,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 ElevatedButton(
                     onPressed: (() async {
-                      
                       try {
                         await _initializeControllerFuture;
                         final image = await _controller.takePicture();
                         if (!mounted) return;
-                        Provider.of<FireStorageProvider>(context, listen: false)
+                        Provider.of<StorageProvider>(context, listen: false)
                             .imagePath = image.path;
-                        // print("Take a picture success: " +
-                        //     Provider.of<FireStorageProvider>(context,
-                        //             listen: false)
-                        //         .imagePath
-                        //         .toString());
-                        Provider.of<RouteProvider>(context, listen: false)
+                        logWarning(
+                            "----------Take photo: ${Provider.of<StorageProvider>(context, listen: false).imagePath}");
+                        Provider.of<GuardViewModel>(context, listen: false)
                             .changeTakeSuccessfull();
                       } catch (e) {
-                        // print(e);
+                        logError('----------Internal Error: $e');
                       }
                     }),
                     style: ElevatedButton.styleFrom(
@@ -89,7 +89,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                         padding: const EdgeInsets.all(1)),
                     child: const Icon(
                       Icons.circle,
-                      size: 50,
+                      size: 70,
                       color: Colors.blue,
                     )),
               ]),

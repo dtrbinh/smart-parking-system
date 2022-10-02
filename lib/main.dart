@@ -6,6 +6,7 @@ import 'package:smart_parking_system/features/error/ErrorLogger.dart';
 import 'firebase_options.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+
 Future<void> main() async {
   try {
     await dotenv.load(fileName: "assets/roboflow.env");

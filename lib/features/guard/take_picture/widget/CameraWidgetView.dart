@@ -5,7 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/features/error/ErrorLogger.dart';
 import 'package:smart_parking_system/features/guard/GuardViewModel.dart';
-import 'package:smart_parking_system/data/provider/storage_provider.dart';
+import 'package:smart_parking_system/data/provider/GuardProvider.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class CameraWidgetView extends StatefulWidget {
@@ -44,6 +44,7 @@ class CameraWidgetViewState extends State<CameraWidgetView> {
       children: [
         Container(
           width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5), color: Colors.grey),
           child: FutureBuilder<void>(
@@ -54,7 +55,7 @@ class CameraWidgetViewState extends State<CameraWidgetView> {
               } else {
                 return const Center(
                     child: SpinKitRipple(
-                  color: Colors.blue,
+                  color: Colors.white,
                   size: 100,
                   borderWidth: 10,
                 ));
@@ -73,10 +74,10 @@ class CameraWidgetViewState extends State<CameraWidgetView> {
                         await _initializeControllerFuture;
                         final image = await _controller.takePicture();
                         if (!mounted) return;
-                        Provider.of<StorageProvider>(context, listen: false)
-                            .imagePath = image.path;
+                        Provider.of<GuardProvider>(context, listen: false)
+                            .guardRepository.imagePath = image.path;
                         logWarning(
-                            "----------Take photo: ${Provider.of<StorageProvider>(context, listen: false).imagePath}");
+                            "----------Take photo: ${Provider.of<GuardProvider>(context, listen: false).guardRepository.imagePath}");
                         Provider.of<GuardViewModel>(context, listen: false)
                             .changeTakeSuccessfull();
                       } catch (e) {
@@ -90,7 +91,7 @@ class CameraWidgetViewState extends State<CameraWidgetView> {
                     child: const Icon(
                       Icons.circle,
                       size: 70,
-                      color: Colors.blue,
+                      color: Colors.black,
                     )),
               ]),
             ))

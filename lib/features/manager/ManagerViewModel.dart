@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:smart_parking_system/data/models/manager_data.dart';
+import 'package:smart_parking_system/data/datasources/repository/ManagerRepository.dart';
 import 'package:smart_parking_system/features/login_screen/LoginView.dart';
 import 'package:smart_parking_system/features/manager/dashboard/dashboard.dart';
 import 'package:smart_parking_system/features/manager/settings/settings.dart';
@@ -8,7 +8,7 @@ import 'package:smart_parking_system/features/manager/status_report/today_report
 class ManagerViewModel extends ChangeNotifier {
   int selectedIndex = 0;
 
-  ManagerData data = ManagerData();
+  ManagerRepository data = ManagerRepository();
   int totalCheckIn = 0;
   int totalCheckOut = 0;
   double totalIncome = 0;

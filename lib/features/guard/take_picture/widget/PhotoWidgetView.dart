@@ -10,7 +10,9 @@ class PhotoWidgetView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.file(
       File(imagePath),
-      fit: BoxFit.fill,
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      fit: BoxFit.fitHeight,
     );
   }
 }

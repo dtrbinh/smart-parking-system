@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:smart_parking_system/data/models/parker.dart';
+import 'package:smart_parking_system/data/models/Parker.dart';
 
-class ManagerData {
+class ManagerRepository {
   int selectedManagerType = 0;
   double parkingFee = 0;
   List<Parker> resultData = [];

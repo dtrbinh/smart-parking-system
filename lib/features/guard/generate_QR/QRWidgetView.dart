@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/features/guard/GuardViewModel.dart';
-import 'package:smart_parking_system/data/provider/storage_provider.dart';
+import 'package:smart_parking_system/data/provider/GuardProvider.dart';
 
 class QRWidgetView extends StatefulWidget {
   const QRWidgetView({
@@ -17,8 +17,8 @@ class QRWidgetView extends StatefulWidget {
 class _QRWidgetViewState extends State<QRWidgetView> {
   @override
   Widget build(BuildContext context) {
-    return (context.watch<StorageProvider>().isDetect)
-        ? context.watch<StorageProvider>().isDetectSuccess
+    return (context.watch<GuardProvider>().guardRepository.isDetect)
+        ? context.watch<GuardProvider>().guardRepository.isDetectSuccess
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -26,11 +26,11 @@ class _QRWidgetViewState extends State<QRWidgetView> {
                     width: MediaQuery.of(context).size.width * 3 / 4,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Colors.blue),
+                        color: Colors.black),
                     child: Column(
                       children: context
-                          .read<StorageProvider>()
-                          .listNumplateText
+                          .read<GuardProvider>()
+                          .guardRepository.listNumplateText
                           .map((e) => Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: Text(
@@ -44,13 +44,13 @@ class _QRWidgetViewState extends State<QRWidgetView> {
                           .toList(),
                     ),
                   ),
-                  (context.watch<StorageProvider>().linkQR != '')
+                  (context.watch<GuardProvider>().guardRepository.linkQR != '')
                       ? Container(
                           color: Colors.white,
                           child: Column(
                             children: [
                               Image.network(
-                                context.read<StorageProvider>().linkQR,
+                                context.read<GuardProvider>().guardRepository.linkQR,
                                 height:
                                     MediaQuery.of(context).size.width * 3 / 4,
                                 width:
@@ -67,7 +67,7 @@ class _QRWidgetViewState extends State<QRWidgetView> {
                                 context
                                     .read<GuardViewModel>()
                                     .changeTakeSuccessfull();
-                                context.read<StorageProvider>().resetProvider();
+                                context.read<GuardProvider>().resetProvider();
                               }),
                               const SizedBox(
                                 height: 20,
@@ -111,7 +111,7 @@ class _QRWidgetViewState extends State<QRWidgetView> {
                   callbackButton(Icons.arrow_back, () {
                     context.read<GuardViewModel>().changeConfirmGenerate();
                     context.read<GuardViewModel>().changeTakeSuccessfull();
-                    context.read<StorageProvider>().resetProvider();
+                    context.read<GuardProvider>().resetProvider();
                   })
                 ],
               )

@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/architecture/BaseViewModel.dart';
-import 'package:smart_parking_system/data/provider/camera_provider.dart';
-import 'package:smart_parking_system/data/provider/storage_provider.dart';
+import 'package:smart_parking_system/data/provider/CameraProvider.dart';
+import 'package:smart_parking_system/data/provider/GuardProvider.dart';
 import 'package:smart_parking_system/features/error/ErrorLogger.dart';
 import 'package:smart_parking_system/features/guard/scan_QR/ScanQRView.dart';
 import 'package:smart_parking_system/features/guard/take_picture/TakePhotoView.dart';
@@ -48,16 +48,21 @@ class GuardViewModel extends BaseViewModel {
   }
 
   void logout(BuildContext context) {
-    Navigator.pop(context);
     try {
-      context
-          .read<StorageProvider>()
-          .deleteImageCache(File(context.read<StorageProvider>().imagePath));
+      context.read<GuardProvider>().deleteImageCache(
+          File(context.read<GuardProvider>().guardRepository.imagePath));
       context.read<GuardViewModel>().resetProvider();
       context.read<CameraProvider>().resetProvider();
-      context.read<StorageProvider>().resetProvider();
+      context.read<GuardProvider>().resetProvider();
+      context.read<GuardProvider>().accountRepository.handleSignOut();
     } catch (e) {
       logError('----------Internal Error: $e');
-    } finally {}
+    } finally {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginView(),
+          ));
+    }
   }
 }

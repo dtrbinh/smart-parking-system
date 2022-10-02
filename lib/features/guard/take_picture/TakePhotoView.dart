@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_parking_system/data/provider/camera_provider.dart';
+import 'package:smart_parking_system/data/provider/CameraProvider.dart';
 import 'package:smart_parking_system/features/guard/GuardViewModel.dart';
-import 'package:smart_parking_system/data/provider/storage_provider.dart';
+import 'package:smart_parking_system/data/provider/GuardProvider.dart';
 import 'package:smart_parking_system/features/guard/generate_QR/QRWidgetView.dart';
 import 'package:smart_parking_system/features/guard/take_picture/widget/CameraWidgetView.dart';
 import 'package:smart_parking_system/features/guard/take_picture/widget/PhotoWidgetView.dart';
@@ -19,17 +19,16 @@ class _TakePhotoViewState extends State<TakePhotoView> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       color: Colors.white,
-      child: Center(child: Consumer(
-        builder: (context, value, child) {
-          return context.watch<GuardViewModel>().confirmGenerate
+      child: Center(
+          child: context.watch<GuardViewModel>().confirmGenerate
               ? const QRWidgetView()
               : context.watch<GuardViewModel>().takeSuccessful
                   ? _confirmPicture(context)
                   : CameraWidgetView(
-                      camera: context.watch<CameraProvider>().firstCamera!);
-        },
-      )),
+                      camera: context.read<CameraProvider>().firstCamera!)),
     );
   }
 
@@ -42,7 +41,8 @@ class _TakePhotoViewState extends State<TakePhotoView> {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5), color: Colors.grey),
           child: PhotoWidgetView(
-              imagePath: Provider.of<StorageProvider>(context, listen: false)
+              imagePath: Provider.of<GuardProvider>(context, listen: false)
+                  .guardRepository
                   .imagePath),
         ),
         Positioned(
@@ -52,10 +52,11 @@ class _TakePhotoViewState extends State<TakePhotoView> {
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 ElevatedButton(
                     onPressed: (() {
-                      Provider.of<StorageProvider>(context, listen: false)
-                          .deleteImageCache(File(Provider.of<StorageProvider>(
+                      Provider.of<GuardProvider>(context, listen: false)
+                          .deleteImageCache(File(Provider.of<GuardProvider>(
                                   context,
                                   listen: false)
+                              .guardRepository
                               .imagePath));
                       Provider.of<GuardViewModel>(context, listen: false)
                           .changeTakeSuccessfull();
@@ -70,7 +71,7 @@ class _TakePhotoViewState extends State<TakePhotoView> {
                 ElevatedButton(
                     onPressed: (() {
                       //Gửi lên firebase thành công thì tự xoá ảnh trong local
-                      Provider.of<StorageProvider>(context, listen: false)
+                      Provider.of<GuardProvider>(context, listen: false)
                           .uploadImage();
                       //Lấy link ảnh firebase dùng API generate link ảnh QR và nhận dạng biển số xe
                       //Xác nhận gen thành công, gửi link QR sang để hiển thị và in

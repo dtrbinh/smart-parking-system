@@ -17,7 +17,7 @@ class _GuardViewState extends BaseViewState<GuardView, GuardViewModel> {
   @override
   Widget getView() {
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         appBar: AppBar(
           title: const Text("System Manager"),
           automaticallyImplyLeading: false,
@@ -25,6 +25,9 @@ class _GuardViewState extends BaseViewState<GuardView, GuardViewModel> {
             IconButton(
                 onPressed: () {
                   viewModel.logout(context);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      duration: Duration(seconds: 1),
+                      content: Text("Logout successfully!")));
                 },
                 icon: const Icon(Icons.logout))
           ],

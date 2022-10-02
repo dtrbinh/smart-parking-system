@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:smart_parking_system/data/models/parker.dart';
+import 'package:smart_parking_system/data/models/Parker.dart';
 import 'package:smart_parking_system/features/error/ErrorLogger.dart';
 
 class ScannerProvider extends ChangeNotifier {

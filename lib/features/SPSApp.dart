@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_parking_system/data/provider/camera_provider.dart';
-import 'package:smart_parking_system/data/provider/qr_scanner_provider.dart';
-import 'package:smart_parking_system/data/provider/storage_provider.dart';
+import 'package:smart_parking_system/core/constants/pallete.dart';
+import 'package:smart_parking_system/data/provider/CameraProvider.dart';
+import 'package:smart_parking_system/data/provider/QRProvider.dart';
+import 'package:smart_parking_system/data/provider/GuardProvider.dart';
 import 'package:smart_parking_system/features/guard/GuardViewModel.dart';
 import 'package:smart_parking_system/features/login_screen/LoginView.dart';
 import 'package:smart_parking_system/features/manager/ManagerViewModel.dart';
@@ -24,7 +25,7 @@ class SPSApp extends StatelessWidget {
           create: (context) => CameraProvider(),
         ),
         ChangeNotifierProvider(
-          create: (context) => StorageProvider(),
+          create: (context) => GuardProvider(),
         ),
         ChangeNotifierProvider(
           create: (context) => ScannerProvider(),
@@ -35,7 +36,8 @@ class SPSApp extends StatelessWidget {
         title: 'Flutter Demo',
         theme: ThemeData(
           // is not restarted.
-          primarySwatch: Colors.blue,
+          primaryColor: Colors.black,
+          primarySwatch: primaryBlack,
         ),
         home: const LoginView(),
       ),

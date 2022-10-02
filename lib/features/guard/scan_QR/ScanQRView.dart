@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:smart_parking_system/data/provider/qr_scanner_provider.dart';
+import 'package:smart_parking_system/data/provider/QRProvider.dart';
 
 class ScanQRView extends StatefulWidget {
   const ScanQRView({Key? key}) : super(key: key);
@@ -136,7 +136,7 @@ class _ScanQRViewState extends State<ScanQRView> {
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
       overlay: QrScannerOverlayShape(
-          borderColor: Colors.blue,
+          borderColor: Colors.white,
           borderRadius: 10,
           borderLength: 30,
           borderWidth: 10,

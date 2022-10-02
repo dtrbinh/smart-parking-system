@@ -20,7 +20,7 @@ class StorageProvider extends ChangeNotifier {
   String imagePath = "";
   String linkImageFireStorage = "";
 
-  String linkQR = "";
+  String linkQR = '';
   List<String> qrHistory = [];
 
   bool isDetect = false;
@@ -42,12 +42,13 @@ class StorageProvider extends ChangeNotifier {
             .putFile(file)
             .then((p0) async {
           linkImageFireStorage = await p0.ref.getDownloadURL();
-          generateQR();
-          getNumplate();
-        }).onError((error, stackTrace) {
+        }).onError((error, stackTrace) async {
           logError('----------Internal Error: $error');
+          await Sentry.captureException(
+            error,
+            stackTrace: stackTrace,
+          );
         });
-        await uploadData();
       } catch (e, stackTrace) {
         logError('----------Internal Error: $e');
         await Sentry.captureException(
@@ -55,6 +56,7 @@ class StorageProvider extends ChangeNotifier {
           stackTrace: stackTrace,
         );
       } finally {
+        getNumplate();
         notifyListeners();
       }
     } else {
@@ -73,7 +75,8 @@ class StorageProvider extends ChangeNotifier {
     String fileName = basename(imagePath);
     fileName = fileName.replaceAll('CAP', '');
     fileName = fileName.replaceAll('.jpg', '');
-    Parker newParker = Parker(fileName, linkImageFireStorage, linkQR);
+    Parker newParker =
+        Parker(fileName, listNumplateText[0], linkImageFireStorage, linkQR);
     parkers.doc(newParker.parkerID).set(newParker.toJson()).then((value) {
       // print('Parker add success');
     }).catchError((error, stackTrace) async {
@@ -86,9 +89,13 @@ class StorageProvider extends ChangeNotifier {
   }
 
   void generateQR() {
-    linkQR =
-        "http://api.qrserver.com/v1/create-qr-code/?data=$linkImageFireStorage&size=400x400";
-    qrHistory.add(linkQR);
+    if(isDetectSuccess){
+      linkQR =
+      "http://api.qrserver.com/v1/create-qr-code/?data=$linkImageFireStorage&size=400x400";
+      qrHistory.add(linkQR);
+    } else {
+      linkQR = '';
+    }
     notifyListeners();
   }
 
@@ -179,10 +186,13 @@ class StorageProvider extends ChangeNotifier {
         }
         textRecognizer.close();
         isDetectSuccess = true;
+        generateQR();
+        await uploadData();
         //scan image
       } else {
         isDetectSuccess = false;
         logError('----------Internal Error: No image to scan.');
+        deleteImageFireStorage(linkImageFireStorage);
         await Sentry.captureException(
           Exception("No image to scan"),
           stackTrace: "No stack trace",
@@ -227,10 +237,22 @@ class StorageProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteImageFireStorage(String imageURL) async {
+    FirebaseStorage.instance.refFromURL(imageURL).delete().then((value) {
+      logWarning('----------Deleted image: $linkImageFireStorage.');
+    }).catchError((error, stackTrace) async {
+      logError('----------Internal Error: $error');
+      await Sentry.captureException(
+        Exception("File to delete not exists"),
+        stackTrace: stackTrace,
+      );
+    });
+  }
+
   void resetProvider() {
     imagePath = "";
     linkImageFireStorage = "";
-    linkQR = "";
+    linkQR = '';
     qrHistory = [];
     detectBox = null;
     isDetect = false;

@@ -6,11 +6,8 @@ import 'package:smart_parking_system/features/guard/GuardViewModel.dart';
 import 'package:smart_parking_system/data/provider/storage_provider.dart';
 
 class QRWidgetView extends StatefulWidget {
-  final String linkQR;
-
   const QRWidgetView({
     super.key,
-    required this.linkQR,
   });
 
   @override
@@ -20,90 +17,130 @@ class QRWidgetView extends StatefulWidget {
 class _QRWidgetViewState extends State<QRWidgetView> {
   @override
   Widget build(BuildContext context) {
-    return (context.watch<StorageProvider>().linkQR != "")
-        ? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-              context.watch<StorageProvider>().isDetect
-                  ? context.watch<StorageProvider>().isDetectSuccess
+    return (context.watch<StorageProvider>().isDetect)
+        ? context.watch<StorageProvider>().isDetectSuccess
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 3 / 4,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.blue),
+                    child: Column(
+                      children: context
+                          .read<StorageProvider>()
+                          .listNumplateText
+                          .map((e) => Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  e,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                  (context.watch<StorageProvider>().linkQR != '')
                       ? Container(
-                          width: MediaQuery.of(context).size.width * 3 / 4,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.blue),
+                          color: Colors.white,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: context
-                                .read<StorageProvider>()
-                                .listNumplateText
-                                .map((e) => Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                        e,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                ))
-                                .toList(),
+                            children: [
+                              Image.network(
+                                context.read<StorageProvider>().linkQR,
+                                height:
+                                    MediaQuery.of(context).size.width * 3 / 4,
+                                width:
+                                    MediaQuery.of(context).size.width * 3 / 4,
+                                fit: BoxFit.fill,
+                              ),
+                              const SizedBox(
+                                height: 50,
+                              ),
+                              callbackButton(Icons.print, () {
+                                context
+                                    .read<GuardViewModel>()
+                                    .changeConfirmGenerate();
+                                context
+                                    .read<GuardViewModel>()
+                                    .changeTakeSuccessfull();
+                                context.read<StorageProvider>().resetProvider();
+                              }),
+                              const SizedBox(
+                                height: 20,
+                              )
+                            ],
                           ),
                         )
-                      : const Center(
-                          child: Text("Cant detect numplate."),
-                        )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text("Plate number detecting"),
-                        SizedBox(
-                          height: 10,
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "Generating QR...",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            SpinKitFadingCircle(
+                              color: Colors.black,
+                              size: 70,
+                            ),
+                          ],
                         ),
-                        SpinKitFadingCircle(
-                          color: Colors.black,
-                          size: 70,
-                        ),
-                      ],
-                    ),
-              const Spacer(),
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.transparent),
-                child: Consumer(
-                  builder: (context, value, child) {
-                    return Container(
-                      color: Colors.white,
-                      width: MediaQuery.of(context).size.width * 3 / 4,
-                      child:
-                          Image.network(context.read<StorageProvider>().linkQR),
-                    );
-                  },
-                ),
-              ),
-              const Spacer(),
-              ElevatedButton(
-                  onPressed: (() {
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Cant detect numplate.\nPlease try again.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red),
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  callbackButton(Icons.arrow_back, () {
                     context.read<GuardViewModel>().changeConfirmGenerate();
                     context.read<GuardViewModel>().changeTakeSuccessfull();
                     context.read<StorageProvider>().resetProvider();
-                  }),
-                  style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(20)),
-                  child: const Icon(
-                    Icons.print,
-                  )),
-              const SizedBox(
-                height: 20,
+                  })
+                ],
               )
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text(
+                "Plate number detecting...",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              SpinKitFadingCircle(
+                color: Colors.black,
+                size: 70,
+              ),
             ],
-          )
-        : const Center(
-            child: SpinKitFadingCircle(
-              color: Colors.black,
-              size: 100,
-            ));
+          );
+  }
+
+  Widget callbackButton(IconData icon, VoidCallback onPressed) {
+    return ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(), padding: const EdgeInsets.all(20)),
+        child: Icon(
+          icon,
+          // Icons.print,
+        ));
   }
 }

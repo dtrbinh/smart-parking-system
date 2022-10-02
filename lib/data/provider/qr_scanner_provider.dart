@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:smart_parking_system/data/models/parker.dart';
 import 'package:smart_parking_system/features/error/ErrorLogger.dart';
 
 class ScannerProvider extends ChangeNotifier {
   final fireStore = FirebaseFirestore.instance;
+
   Barcode? result;
   String qrResult = "";
   String imageURL = "";
@@ -36,32 +37,43 @@ class ScannerProvider extends ChangeNotifier {
   Future<void> checkParker() async {
     String parkerID = imageURL.substring(
         imageURL.indexOf('CAP') + 3, imageURL.indexOf('.jpg'));
-    await fireStore.collection("Parkers").doc(parkerID).get().then((value) {
+    await fireStore.collection("Parkers").doc(parkerID).get().then((value) async {
       try {
         Parker parkerCheckOut =
             Parker.fromJson(value.data() as Map<String, dynamic>);
         isCheckOut = parkerCheckOut.isCheckOut;
-        checkOutTime = parkerCheckOut.checkOut;
+        checkOutTime = parkerCheckOut.checkOut!;
         isFetching = false;
-      } catch (e) {
+      } catch (e, stackTrace) {
         logError('----------Internal Error: $e');
+        await Sentry.captureException(
+          Exception("File to delete not exists"),
+          stackTrace: stackTrace,
+        );
       } finally {
         notifyListeners();
       }
-    }).onError((error, stackTrace) {
+    }).onError((error, stackTrace) async {
       logError('----------Internal Error: $error');
+      await Sentry.captureException(
+        Exception("File to delete not exists"),
+        stackTrace: stackTrace,
+      );
     });
   }
 
   void updateParkerCheckout() {
     String parkerID = imageURL.substring(
         imageURL.indexOf('CAP') + 3, imageURL.indexOf('.jpg'));
-    CollectionReference parkers = fireStore.collection("Parkers");
-    parkers.doc(parkerID).update(
+    fireStore.collection("Parkers").doc(parkerID).update(
         {'checkOut': Timestamp.now(), 'isCheckOut': true}).then((value) {
       logWarning('----------Update parker checkout success.');
-    }).catchError((error) {
+    }).catchError((error, stackTrace) async {
       logError('----------Internal Error: $error');
+      await Sentry.captureException(
+        Exception("File to delete not exists"),
+        stackTrace: stackTrace,
+      );
     });
     notifyListeners();
   }
@@ -70,14 +82,6 @@ class ScannerProvider extends ChangeNotifier {
     updateParkerCheckout();
     resetProvider();
     notifyListeners();
-  }
-
-  Future<void> deleteImage() async {
-    FirebaseStorage.instance.refFromURL(imageURL).delete().then((value) {
-      logWarning('----------Delete image success.');
-    }).catchError((error) {
-      logError('----------Internal Error: $error');
-    });
   }
 
   void resetProvider() {

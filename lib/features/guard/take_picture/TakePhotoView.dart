@@ -23,9 +23,7 @@ class _TakePhotoViewState extends State<TakePhotoView> {
       child: Center(child: Consumer(
         builder: (context, value, child) {
           return context.watch<GuardViewModel>().confirmGenerate
-              ? QRWidgetView(
-                  linkQR: context.watch<StorageProvider>().linkImageFireStorage,
-                )
+              ? const QRWidgetView()
               : context.watch<GuardViewModel>().takeSuccessful
                   ? _confirmPicture(context)
                   : CameraWidgetView(

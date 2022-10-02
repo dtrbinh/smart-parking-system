@@ -2,18 +2,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Parker {
   late String parkerID;
-  late Timestamp checkIn;
-  late Timestamp checkOut;
+  late String plateNumber;
+  late Timestamp? checkIn;
+  late Timestamp? checkOut;
   late String imageURL;
   late String qrURL;
   late bool isCheckOut;
-  Parker(this.parkerID, this.imageURL, this.qrURL) {
+
+  Parker(this.parkerID, this.plateNumber, this.imageURL, this.qrURL) {
     isCheckOut = false;
     checkIn = Timestamp.now();
-    checkOut = Timestamp(0, 0);
+    checkOut = null;
   }
+
   Map<String, dynamic> toJson() => {
         'parkerID': parkerID,
+        'plateNumber': plateNumber,
         'checkIn': checkIn,
         'checkOut': checkOut,
         'imageURL': imageURL,
@@ -23,6 +27,7 @@ class Parker {
 
   Parker.fromJson(Map<String, dynamic> parseJson) {
     parkerID = parseJson['parkerID'];
+    plateNumber = parseJson['plateNumber'];
     checkIn = parseJson['checkIn'];
     checkOut = parseJson['checkOut'];
     imageURL = parseJson['imageURL'];
